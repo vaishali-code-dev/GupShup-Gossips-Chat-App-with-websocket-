@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const BASE_URL = "http://localhost:8088";
+import { BASE_URL } from "../constant";
 
 const createConversation = (payload) => {
   return axios.post(`${BASE_URL}/api/conversation`, payload);

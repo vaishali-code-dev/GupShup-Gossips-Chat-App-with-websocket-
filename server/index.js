@@ -13,6 +13,8 @@ import Users from "./models/Users.js";
 import Conversations from "./models/conversations.js";
 import Messages from "./models/messages.js";
 
+const PORT = process.env.PORT || 8088;
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -251,7 +253,7 @@ io.on("connection", (socket) => {
 
 //DB CONNECT
 connectDB().then(() => {
-  server.listen(8088, () => {
+  server.listen(PORT, () => {
     console.log("server running at http://localhost:8088");
   });
 });
