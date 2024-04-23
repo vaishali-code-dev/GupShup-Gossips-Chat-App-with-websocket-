@@ -22,11 +22,7 @@ const io = new Server(server, {
     origin: "http://localhost:9000",
   },
 });
-app.use(
-  cors({
-    origin: "http://localhost:9000",
-  })
-);
+app.use(cors());
 
 // Middlewares
 app.use(express.json());
