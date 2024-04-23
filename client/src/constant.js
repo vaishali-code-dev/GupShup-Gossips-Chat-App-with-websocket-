@@ -9,7 +9,6 @@ const loginUserInitialValues = {
   password: "",
 };
 
-const BASE_URL = "https://ghupshup-gossips-e7f347129e3f.herokuapp.com/";
-// const BASE_URL = "http://localhost:8088";
+const BASE_URL = process.env.BASE_URL;
 
 export { signUserInitialValues, loginUserInitialValues, BASE_URL };
