@@ -238,7 +238,25 @@ io.on("connection", (socket) => {
 
   socket.on("sendMsg", (newMsg) => {
     let findOnlineUser = onlineUsers.find((el) => el.userId === newMsg.receiverId);
-    io.to(findOnlineUser.socketId).emit("getNewMessages", newMsg);
+    if (findOnlineUser) {
+      io.to(findOnlineUser.socketId).emit("getNewMessages", newMsg);
+    }
+  });
+
+  socket.on("sendConversation", async (newConv) => {
+    let findOnlineUser = onlineUsers.find((el) => el.userId === newConv.user.id);
+    if (findOnlineUser) {
+      let user = await Users.findById(newConv?.userId);
+      let resData = {
+        user: {
+          name: user.fullName,
+          email: user.email,
+          id: user._id,
+        },
+        conversationId: newConv?.conversationId,
+      };
+      io.to(findOnlineUser.socketId).emit("getNewConversation", resData);
+    }
   });
 
   socket.on("disconnect", () => {

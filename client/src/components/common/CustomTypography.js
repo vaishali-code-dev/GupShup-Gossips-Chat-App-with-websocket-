@@ -1,6 +1,6 @@
+import React from "react";
 import { Typography } from "@mui/material";
 import classNames from "classnames";
-import React from "react";
 
 const CustomTypography = ({ label = "Ghupshup & Gossips", variant = "h5", className, wrapperClassName, ...rest }) => {
   return (

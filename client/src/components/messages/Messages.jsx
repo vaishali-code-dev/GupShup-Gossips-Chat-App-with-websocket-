@@ -1,22 +1,19 @@
-import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import CustomTypography from "./CustomTypography";
-import Message from "./Message";
-import Input from "./Input";
-import { AddIcCall, Send } from "@mui/icons-material";
-import ProfileAvatar from "./ProfileAvatar";
-import { getMessages, sendMessageApi } from "../apis/messages";
-import useToaster from "../hooks/useToaster";
-import { AuthContext } from "../context/authContext";
+import { Send } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { io } from "socket.io-client";
-import { BASE_URL } from "../constant";
+import classNames from "classnames";
+import useToaster from "hooks/useToaster";
+import { AuthContext } from "context/authContext";
+import { SocketContext } from "context/socketContext";
+import { getMessages, sendMessageApi } from "apis/messages";
+import { CustomTypography, Message, Input, MessageHeader } from "components";
 
-const Messages = ({ customClassName, selectedConversation }) => {
+const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI }) => {
   const [userInput, setuserInput] = useState("");
   const [messagesList, setMessagesList] = useState("");
   const { showToast } = useToaster();
   const { currentUser } = useContext(AuthContext);
+  const { socket, onlineUsers } = useContext(SocketContext);
   const bottomScrollViewRef = useRef();
   useEffect(() => {
     if (bottomScrollViewRef.current) {
@@ -24,17 +21,8 @@ const Messages = ({ customClassName, selectedConversation }) => {
     }
   }, [selectedConversation, messagesList]);
 
-  const [socket, setsocket] = useState(null);
-  useEffect(() => {
-    setsocket(io(BASE_URL));
-  }, []);
-
   useEffect(() => {
     if (socket && currentUser) {
-      socket.emit("addUser", currentUser._id);
-      socket.on("getOnlineUsers", (users) => {
-        console.log(users);
-      });
       socket.on("getNewMessages", (newMsg) => {
         setMessagesList((prevMssg) => [...prevMssg, newMsg]);
       });
@@ -88,36 +76,11 @@ const Messages = ({ customClassName, selectedConversation }) => {
   };
 
   return (
-    <div className={classNames("p-6", customClassName)}>
-      <div
-        className={classNames("flex gap-4 items-center mb-4 bg-primaryLightBg p-2 pl-4 pr-8 rounded-full", {
-          "justify-center": !selectedConversation,
-          "justify-between": selectedConversation,
-        })}
-      >
-        <div
-          className={classNames("flex gap-4 items-center", {
-            "justify-center": !selectedConversation,
-            "justify-start": selectedConversation,
-          })}
-        >
-          {selectedConversation && <ProfileAvatar name={selectedConversation?.user?.name} w={40} h={40} />}
-          <CustomTypography
-            label={selectedConversation?.user?.name ?? "Select a conversation to start chat"}
-            variant="h6"
-            className="ubuntu-medium"
-          />
-        </div>
-        <AddIcCall
-          className={classNames("text-textBlack cursor-pointer hover:!text-hoverTextBg hover:transition-transform", {
-            "!hidden": !selectedConversation,
-          })}
-        />
-      </div>
-
+    <div className={classNames("p-2 pt-2.5 lg:p-6", customClassName)}>
+      <MessageHeader selectedConversation={selectedConversation} setIsShowMessageUI={setIsShowMessageUI} />
       {selectedConversation && (
         <>
-          <div className="shadow-sm h-[calc(100vh-12rem)] flex flex-col gap-2 overflow-y-auto useScrollbar mb-6">
+          <div className="shadow-sm h-[calc(100vh-10rem)] lg:h-[calc(100vh-12rem)] flex flex-col gap-2 overflow-y-auto useScrollbar mb-6">
             {!!messagesList.length ? (
               messagesList?.map((message, index) => (
                 <Message key={index} message={message} isAdmin={message.senderId === currentUser._id} />
@@ -132,7 +95,7 @@ const Messages = ({ customClassName, selectedConversation }) => {
             <label ref={bottomScrollViewRef} />
           </div>
 
-          <form className="flex gap-6" onSubmit={handleSendMessage}>
+          <form className="flex gap-2 lg:gap-6" onSubmit={handleSendMessage}>
             <Input
               hiddenLabel
               label=""

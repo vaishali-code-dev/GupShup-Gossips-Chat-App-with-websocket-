@@ -1,15 +1,16 @@
 import React, { useContext } from "react";
-import ProfileAvatar from "./ProfileAvatar";
-import { AuthContext } from "context/authContext";
-import CustomTypography from "./CustomTypography";
-import classNames from "classnames";
-import ButtonUsage from "./ButtonUsage";
 import { useNavigate } from "react-router-dom";
+import classNames from "classnames";
+import { AuthContext } from "context/authContext";
+import { SocketContext } from "context/socketContext";
 import useToaster from "hooks/useToaster";
+import { checkOnlineusers } from "helpers";
 import { logoutUser } from "apis/login";
+import { ProfileAvatar, CustomTypography, ButtonUsage } from "components";
 
 const Conversation = ({ convData, isAdmin = false, setSelectedConversation, className, selectedConversation }) => {
   const { currentUser } = useContext(AuthContext);
+  const { onlineUsers } = useContext(SocketContext);
   const Navigate = useNavigate();
   const { showToast } = useToaster();
 
@@ -20,7 +21,12 @@ const Conversation = ({ convData, isAdmin = false, setSelectedConversation, clas
     if (!isAdmin && !convData) {
       return null;
     }
-    return <ProfileAvatar name={isAdmin ? currentUser?.fullName : convData?.user?.name} />;
+    return (
+      <ProfileAvatar
+        name={isAdmin ? currentUser?.fullName : convData?.user?.name}
+        isOnline={!!checkOnlineusers(currentUser?._id, onlineUsers, convData)}
+      />
+    );
   };
 
   const logOutUser = () => {

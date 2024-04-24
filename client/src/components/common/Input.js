@@ -1,9 +1,9 @@
+import React, { useState } from "react";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
-import React from "react";
 import Icon from "@mui/material/Icon";
 
 const Input = ({ value, handleChange, label, type, ...rest }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   return (
     <TextField

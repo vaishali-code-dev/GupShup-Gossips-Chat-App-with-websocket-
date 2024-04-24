@@ -1,16 +1,13 @@
-import classNames from "classnames";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { getConversation } from "apis/conversation";
-import { AuthContext } from "context/authContext";
-import CustomTypography from "./CustomTypography";
-import useToaster from "hooks/useToaster";
-import Conversation from "./Conversation";
-import UserAutoComplete from "./UserAutoComplete";
-import { getUsers } from "apis/login";
 import { PersonAdd } from "@mui/icons-material";
-import ButtonUsage from "./ButtonUsage";
-import { createConversation } from "../apis/conversation";
 import { IconButton } from "@mui/material";
+import classNames from "classnames";
+import { createConversation, getConversation } from "apis/conversation";
+import { AuthContext } from "context/authContext";
+import { SocketContext } from "context/socketContext";
+import useToaster from "hooks/useToaster";
+import { getUsers } from "apis/login";
+import { ButtonUsage, UserAutoComplete, Conversation, CustomTypography } from "components";
 
 const ConversationList = ({ customClassName, setSelectedConversation, selectedConversation }) => {
   const [conversationList, setConversationList] = useState([]);
@@ -20,6 +17,15 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
   const formattedUsersList = useRef([]);
   const { showToast } = useToaster();
   const { currentUser } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket && currentUser) {
+      socket.on("getNewConversation", (newMsg) => {
+        setConversationList((prevMssg) => [...prevMssg, newMsg]);
+      });
+    }
+  }, [socket, currentUser]);
 
   const fetchConversation = async () => {
     try {
@@ -63,6 +69,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
       let senderId = currentUser._id;
       let receiverId = formattedUsersList.current.find((item) => item.label === selectedUserValue.label).id;
       let { data } = await createConversation({ senderId, receiverId });
+      socket.emit("sendConversation", { ...data, userId: currentUser?._id });
       setSelectedConversation(data);
       fetchConversation();
     } catch (error) {
@@ -73,7 +80,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
   return (
     <div className={classNames(customClassName, "bg-primaryLightBg flex flex-col py-4")}>
       <Conversation isAdmin />
-      <div className="p-8 pb-0">
+      <div className="p-4 lg:p-8 pb-0">
         <div
           className={classNames("flex justify-between items-center", {
             "mb-4": isShowAddUserAutoComplete,
