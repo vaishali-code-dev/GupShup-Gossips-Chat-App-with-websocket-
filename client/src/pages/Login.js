@@ -5,9 +5,11 @@ import { loginUserInitialValues } from "../constant";
 import { loginUser } from "apis/login";
 import useToaster from "hooks/useToaster";
 import { AuthContext } from "context/authContext";
+import { isValidEmail } from "helpers";
 
 const Login = () => {
   const [formData, setFormData] = useState(loginUserInitialValues);
+  const [errors, setErrors] = useState({});
   const { currentUser, setUserDetails } = useContext(AuthContext);
   const Navigate = useNavigate();
   const { showToast } = useToaster();
@@ -26,14 +28,19 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      let {
-        data: { user },
-      } = await loginUser(formData);
-      setUserDetails(user);
-      sessionStorage.setItem("token", user?.token);
-      showToast("Logged in successfully.");
-      Navigate("/dashboard");
-      setFormData(loginUserInitialValues);
+      if (!isValidEmail(formData.email)) {
+        setErrors({ ...errors, email: "Please type correct email." });
+      } else {
+        setErrors({});
+        let {
+          data: { user },
+        } = await loginUser({ ...formData, email: String(formData?.email)?.toLowerCase() });
+        setUserDetails(user);
+        sessionStorage.setItem("token", user?.token);
+        showToast("Logged in successfully.");
+        Navigate("/dashboard");
+        setFormData(loginUserInitialValues);
+      }
     } catch (error) {
       showToast("Something wrong");
     }
@@ -45,7 +52,14 @@ const Login = () => {
         <CustomTypography label=" GhupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="flex flex-col gap-6 w-3/4">
-            <Input label="Email" value={formData.email} id="email" handleChange={handleChange} />
+            <Input
+              label="Email"
+              value={formData.email}
+              id="email"
+              handleChange={handleChange}
+              error={errors.email}
+              helperText={errors.email}
+            />
             <Input label="Password" type="password" value={formData.password} id="password" handleChange={handleChange} />
             <ButtonUsage label="LOGIN" type="submit" />
           </div>

@@ -5,9 +5,11 @@ import { signUserInitialValues } from "../constant";
 import { signUpUser } from "apis/login";
 import { Link, useNavigate } from "react-router-dom";
 import useToaster from "hooks/useToaster";
+import { isValidEmail } from "helpers";
 
 const SignUp = () => {
   const [formData, setFormData] = useState(signUserInitialValues);
+  const [errors, setErrors] = useState({});
   const Navigate = useNavigate();
   const { showToast } = useToaster();
 
@@ -26,9 +28,14 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     try {
-      let res = await signUpUser(formData);
-      showToast("User created successfully.");
-      Navigate("/dashboard");
+      if (!isValidEmail(formData.email)) {
+        setErrors({ ...errors, email: "Please type correct email." });
+      } else {
+        setErrors({});
+        let res = await signUpUser({ ...formData, email: String(formData?.email)?.toLowerCase() });
+        showToast("User created successfully.");
+        Navigate("/");
+      }
     } catch (error) {
       showToast("Something wrong");
     }
@@ -41,7 +48,14 @@ const SignUp = () => {
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="flex flex-col gap-6 w-3/4">
             <Input label="Name" value={formData.fullName} id="fullName" handleChange={handleChange} />
-            <Input label="Email" value={formData.email} id="email" handleChange={handleChange} />
+            <Input
+              label="Email"
+              value={formData.email}
+              id="email"
+              handleChange={handleChange}
+              error={errors.email}
+              helperText={errors.email}
+            />
             <Input label="Password" type="password" value={formData.password} id="password" handleChange={handleChange} />
             <ButtonUsage label="SIGNUP" type="submit" />
           </div>
