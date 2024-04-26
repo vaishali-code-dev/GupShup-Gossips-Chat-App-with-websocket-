@@ -7,10 +7,12 @@ import { AuthContext } from "context/authContext";
 import { SocketContext } from "context/socketContext";
 import { getMessages, sendMessageApi } from "apis/messages";
 import { CustomTypography, Message, Input, MessageHeader } from "components";
+import { checkIsUserOnMobile } from "../../helpers";
 
 const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI }) => {
   const [userInput, setuserInput] = useState("");
   const [messagesList, setMessagesList] = useState("");
+  const [isMessagesListLoading, setIsMessagesListLoading] = useState(true);
   const { showToast } = useToaster();
   const { currentUser } = useContext(AuthContext);
   const { socket, onlineUsers } = useContext(SocketContext);
@@ -36,9 +38,11 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
         setMessagesList(data);
       } catch (error) {
         showToast(error);
+      } finally {
+        setIsMessagesListLoading(false);
       }
     },
-    [selectedConversation]
+    [selectedConversation, messagesList]
   );
 
   useEffect(() => {
@@ -75,23 +79,38 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
     }
   };
 
+  const getMessagesListUI = () => {
+    if (isMessagesListLoading) {
+      return Array(10)
+        .fill("")
+        .map((_, index) => <Message key={index} isAdmin={index % 2 === 0} isMessagesListLoading={isMessagesListLoading} />);
+    } else if (!!messagesList.length) {
+      return messagesList?.map((message, index) => (
+        <Message
+          key={index}
+          message={message}
+          isAdmin={message.senderId === currentUser._id}
+          isMessagesListLoading={isMessagesListLoading}
+        />
+      ));
+    } else {
+      return (
+        <CustomTypography
+          wrapperClassName="h-full flex items-center justify-center"
+          label="Be the first to send the message"
+          variant="h6"
+        />
+      );
+    }
+  };
+
   return (
     <div className={classNames("p-2 pt-2.5 lg:p-6", customClassName)}>
       <MessageHeader selectedConversation={selectedConversation} setIsShowMessageUI={setIsShowMessageUI} />
       {selectedConversation && (
         <>
           <div className="shadow-sm h-[calc(100vh-10rem)] lg:h-[calc(100vh-12rem)] flex flex-col gap-2 overflow-y-auto useScrollbar mb-6">
-            {!!messagesList.length ? (
-              messagesList?.map((message, index) => (
-                <Message key={index} message={message} isAdmin={message.senderId === currentUser._id} />
-              ))
-            ) : (
-              <CustomTypography
-                wrapperClassName="h-full flex items-center justify-center"
-                label="Be the first to send the message"
-                variant="h6"
-              />
-            )}
+            {getMessagesListUI()}
             <label ref={bottomScrollViewRef} />
           </div>
 
@@ -103,7 +122,7 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
               onChange={handleMessageChange}
               placeholder="Type a message"
               size="small"
-              autoFocus
+              autoFocus={!checkIsUserOnMobile}
             />
             <IconButton type="submit" color="primary" className="!text-primaryDarkBg" aria-label="send message">
               <Send className="!text-3xl" />

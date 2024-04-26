@@ -26,4 +26,9 @@ const isValidEmail = (email) => {
   return emailPattern.test(email);
 };
 
-export { muitheme, checkOnlineusers, isValidEmail };
+const checkIsUserOnMobile = () => {
+  let width = window.innerWidth;
+  return width < 768;
+};
+
+export { muitheme, checkOnlineusers, isValidEmail, checkIsUserOnMobile };

@@ -8,7 +8,7 @@ const CustomTypography = ({ label = "Ghupshup & Gossips", variant = "h5", classN
       <Typography
         variant={variant}
         component="h2"
-        className={classNames("text-primaryDarkBg text-center !font-bold ubuntu-regular", className)}
+        className={classNames("text-primaryDarkBg text-center !font-bold ubuntu-regular break-words", className)}
         {...rest}
       >
         {label}

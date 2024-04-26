@@ -6,15 +6,25 @@ import { SocketContext } from "context/socketContext";
 import useToaster from "hooks/useToaster";
 import { checkOnlineusers } from "helpers";
 import { logoutUser } from "apis/login";
-import { ProfileAvatar, CustomTypography, ButtonUsage } from "components";
+import { ProfileAvatar, CustomTypography, ButtonUsage, Skeleton } from "components";
 
-const Conversation = ({ convData, isAdmin = false, setSelectedConversation, className, selectedConversation }) => {
+const Conversation = ({
+  convData,
+  isAdmin = false,
+  setSelectedConversation,
+  className,
+  selectedConversation,
+  isConversationListLoading,
+}) => {
   const { currentUser } = useContext(AuthContext);
   const { onlineUsers } = useContext(SocketContext);
   const Navigate = useNavigate();
   const { showToast } = useToaster();
 
   const getConditionalAvatar = () => {
+    if (isConversationListLoading) {
+      return <Skeleton variant="avatar" wrapperClassName={classNames({ hidden: isAdmin })} />;
+    }
     if (isAdmin && !currentUser) {
       return null;
     }
@@ -45,21 +55,40 @@ const Conversation = ({ convData, isAdmin = false, setSelectedConversation, clas
         },
         className
       )}
-      {...(!isAdmin && {
-        onClick: () => {
-          setSelectedConversation(convData);
-        },
-      })}
+      {...(!isAdmin &&
+        !isConversationListLoading && {
+          onClick: () => {
+            setSelectedConversation(convData);
+          },
+        })}
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 lg:gap-4 items-center">
         {getConditionalAvatar()}
         <div>
-          <CustomTypography
-            label={isAdmin ? "Admin" : convData?.user?.name}
-            variant="body1"
-            className="text-start ubuntu-medium"
-          />
-          <CustomTypography label={isAdmin ? currentUser?.email : convData?.user?.email} variant="body2" />
+          <div className="flex gap-2 items-center">
+            {!isConversationListLoading ? (
+              <CustomTypography
+                label={isAdmin ? "Admin" : convData?.user?.name}
+                variant="body1"
+                className="text-start ubuntu-medium"
+              />
+            ) : (
+              <Skeleton
+                wrapperClassName={classNames({
+                  hidden: isAdmin,
+                })}
+              />
+            )}
+          </div>
+          {!isConversationListLoading ? (
+            <CustomTypography label={isAdmin ? currentUser?.email : convData?.user?.email} variant="body2" />
+          ) : (
+            <Skeleton
+              wrapperClassName={classNames({
+                hidden: isAdmin,
+              })}
+            />
+          )}
         </div>
       </div>
       {isAdmin && (

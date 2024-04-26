@@ -11,6 +11,7 @@ import { ButtonUsage, UserAutoComplete, Conversation, CustomTypography } from "c
 
 const ConversationList = ({ customClassName, setSelectedConversation, selectedConversation }) => {
   const [conversationList, setConversationList] = useState([]);
+  const [isConversationListLoading, setIsConversationListLoading] = useState(true);
   const [isShowAddUserAutoComplete, setIsShowAddUserAutoComplete] = useState(false);
   const [selectedUserValue, setSelectedUserValue] = useState(null);
   const [users, setUsers] = useState([]);
@@ -33,6 +34,8 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
       setConversationList(data);
     } catch (error) {
       showToast(error);
+    } finally {
+      setIsConversationListLoading(false);
     }
   };
 
@@ -77,6 +80,39 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
     }
   };
 
+  const getConversationListUI = () => {
+    if (isConversationListLoading) {
+      return Array(5)
+        .fill("")
+        .map((item, index) => (
+          <Conversation
+            key={index}
+            className="bg-primaryWhite first:rounded-t-2xl"
+            isConversationListLoading={isConversationListLoading}
+          />
+        ));
+    } else if (conversationList.length) {
+      return conversationList?.map((item) => (
+        <Conversation
+          convData={item}
+          key={item?.conversationId}
+          className="bg-primaryWhite first:rounded-t-2xl"
+          setSelectedConversation={setSelectedConversation}
+          selectedConversation={selectedConversation}
+          isConversationListLoading={isConversationListLoading}
+        />
+      ));
+    } else {
+      return (
+        <CustomTypography
+          variant="body1"
+          label="No conversations? You can start one by clicking above icon."
+          wrapperClassName="p-4"
+        />
+      );
+    }
+  };
+
   return (
     <div className={classNames(customClassName, "bg-primaryLightBg flex flex-col py-4")}>
       <Conversation isAdmin />
@@ -86,7 +122,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
             "mb-4": isShowAddUserAutoComplete,
           })}
         >
-          <CustomTypography label="Conversations" variant="h6" className="!text-left" />
+          <CustomTypography label="Conversations" variant="h6" className="!text-left !mb-2 text-primaryDarkBg ubuntu-medium" />
           <IconButton
             type="submit"
             color="primary"
@@ -107,21 +143,12 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
         )}
 
         <div
-          className={classNames("rounded-2xl mt-4 max-h-[calc(100vh-14rem)] overflow-y-auto noScrollbar shadow-xl", {
+          className={classNames("rounded-2xl mt-4 max-h-[calc(100vh-14rem)] overflow-y-auto noScrollbar", {
             "max-h-[calc(100vh-18rem)]": isShowAddUserAutoComplete,
+            "shadow-xl": conversationList,
           })}
         >
-          {conversationList?.map((item) => {
-            return (
-              <Conversation
-                convData={item}
-                key={item?.conversationId}
-                className="bg-primaryWhite first:rounded-t-2xl"
-                setSelectedConversation={setSelectedConversation}
-                selectedConversation={selectedConversation}
-              />
-            );
-          })}
+          {getConversationListUI()}
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import ConversationList from "./conversations/ConversationList";
 import Message from "./messages/Message";
 import MessageHeader from "./messages/MessageHeader";
 import Messages from "./messages/Messages";
+import Skeleton from "./common/Skeleton";
 
 export {
   ButtonUsage,
@@ -22,4 +23,5 @@ export {
   Message,
   MessageHeader,
   Messages,
+  Skeleton,
 };
