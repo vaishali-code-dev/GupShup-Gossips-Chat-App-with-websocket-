@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@mui/material/styles";
@@ -56,36 +57,38 @@ const App = () => {
   return (
     <>
       <ThemeProvider theme={muitheme}>
-        <AuthContext.Provider
-          value={{
-            currentUser,
-            setUserDetails,
-          }}
-        >
-          <SocketContext.Provider
+        <GoogleOAuthProvider clientId="763893048858-47a9intierom8a6rv8sstjfkpfrktmj5.apps.googleusercontent.com">
+          <AuthContext.Provider
             value={{
-              socket,
-              onlineUsers,
+              currentUser,
+              setUserDetails,
             }}
           >
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<NoMatch />} />
-              </Routes>
-            </BrowserRouter>
-            <ToastContainer position="bottom-right" progressStyle={{ background: muitheme?.palette?.primary?.main }} />
-          </SocketContext.Provider>
-        </AuthContext.Provider>
+            <SocketContext.Provider
+              value={{
+                socket,
+                onlineUsers,
+              }}
+            >
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="*" element={<NoMatch />} />
+                </Routes>
+              </BrowserRouter>
+              <ToastContainer position="bottom-right" progressStyle={{ background: muitheme?.palette?.primary?.main }} />
+            </SocketContext.Provider>
+          </AuthContext.Provider>
+        </GoogleOAuthProvider>
       </ThemeProvider>
     </>
   );

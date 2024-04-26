@@ -42,21 +42,29 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full h-screen bg-backDropBg">
+    <div className="flex justify-center items-center w-full h-screen bg-primaryWhite">
       <div className="py-6 w-full m-6 md:w-2/5 md:m-0 bg-primaryLightBg rounded-2xl flex flex-col justify-evenly shadow-xl">
         <CustomTypography label=" GhupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="flex flex-col gap-6 w-3/4">
-            <Input label="Name" value={formData.fullName} id="fullName" handleChange={handleChange} />
+            <Input label="Name" value={formData.fullName} id="fullName" variant="standard" handleChange={handleChange} />
             <Input
               label="Email"
-              value={formData.email}
               id="email"
+              value={formData.email}
               handleChange={handleChange}
               error={errors.email}
               helperText={errors.email}
+              variant="standard"
             />
-            <Input label="Password" type="password" value={formData.password} id="password" handleChange={handleChange} />
+            <Input
+              label="Password"
+              type="password"
+              variant="standard"
+              value={formData.password}
+              id="password"
+              handleChange={handleChange}
+            />
             <ButtonUsage label="SIGNUP" type="submit" />
           </div>
         </form>

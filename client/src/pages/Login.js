@@ -1,11 +1,14 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import { ButtonUsage, CustomTypography, Input } from "components";
-import { loginUserInitialValues } from "../constant";
+import { loginUserInitialValues } from "constant";
 import { loginUser } from "apis/login";
 import useToaster from "hooks/useToaster";
 import { AuthContext } from "context/authContext";
 import { isValidEmail } from "helpers";
+import { googleLoginApi } from "apis/login";
+import GoogleSvgComponent from "assets/icons/google";
 
 const Login = () => {
   const [formData, setFormData] = useState(loginUserInitialValues);
@@ -46,8 +49,25 @@ const Login = () => {
     }
   };
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        const { data } = await googleLoginApi(codeResponse);
+        setUserDetails({
+          _id: "notdecided",
+          fullName: data.name,
+          email: data.email,
+        });
+        Navigate("/dashboard");
+      } catch (error) {
+        showToast(`Login failed: ${error}`);
+      }
+    },
+    onError: (error) => showToast(`Login failed: ${error}`),
+  });
+
   return (
-    <div className="flex justify-center items-center w-full h-screen bg-backDropBg">
+    <div className="flex justify-center items-center w-full h-screen bg-primaryWhite">
       <div className="py-6 w-full m-6 md:w-2/5 md:m-0 bg-primaryLightBg rounded-2xl flex flex-col justify-evenly shadow-xl">
         <CustomTypography label=" GhupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
@@ -59,11 +79,27 @@ const Login = () => {
               handleChange={handleChange}
               error={errors.email}
               helperText={errors.email}
+              variant="standard"
             />
-            <Input label="Password" type="password" value={formData.password} id="password" handleChange={handleChange} />
+            <Input
+              label="Password"
+              type="password"
+              value={formData.password}
+              id="password"
+              variant="standard"
+              handleChange={handleChange}
+            />
             <ButtonUsage label="LOGIN" type="submit" />
           </div>
         </form>
+        <div className="flex justify-center pt-4">
+          <ButtonUsage variant="outlined" size="small" onClick={googleLogin}>
+            <div className="flex gap-2 items-center">
+              <GoogleSvgComponent />
+              <CustomTypography variant="body2" label="Sign in with Google" />
+            </div>
+          </ButtonUsage>
+        </div>
         <div>
           <CustomTypography label="Don't have an account?" variant="body2" wrapperClassName="mt-4" />
           <Link to="/signup">

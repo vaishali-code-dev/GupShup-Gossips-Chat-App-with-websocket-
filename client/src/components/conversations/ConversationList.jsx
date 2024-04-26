@@ -96,7 +96,9 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
         <Conversation
           convData={item}
           key={item?.conversationId}
-          className="bg-primaryWhite first:rounded-t-2xl"
+          className={classNames("bg-primaryWhite first:rounded-t-2xl", {
+            "!bg-secondaryLightBg": selectedConversation?.conversationId === item?.conversationId,
+          })}
           setSelectedConversation={setSelectedConversation}
           selectedConversation={selectedConversation}
           isConversationListLoading={isConversationListLoading}
@@ -145,7 +147,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
         <div
           className={classNames("rounded-2xl mt-4 max-h-[calc(100vh-14rem)] overflow-y-auto noScrollbar", {
             "max-h-[calc(100vh-18rem)]": isShowAddUserAutoComplete,
-            "shadow-xl": conversationList,
+            "shadow-xl": conversationList.length,
           })}
         >
           {getConversationListUI()}

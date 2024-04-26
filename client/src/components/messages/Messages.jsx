@@ -61,8 +61,9 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
       };
       socket.emit("sendMsg", payload);
       let { data } = await sendMessageApi(payload);
+      setMessagesList((prevMsg) => [...prevMsg, data?.newMessage]);
       setuserInput("");
-      fetchMessages(selectedConversation);
+      // fetchMessages(selectedConversation);
     } catch (error) {
       showToast(error);
     }
