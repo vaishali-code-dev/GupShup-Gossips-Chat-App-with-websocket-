@@ -51,7 +51,7 @@ const Conversation = ({
       className={classNames(
         "h-24 w-ful p-3 flex items-center justify-between gap-2 overflow-x-auto overflow-y-hidden useScrollbar border-b border-primaryLightBg",
         {
-          "cursor-pointer hover:bg-secondaryLightBg": !isAdmin,
+          "cursor-pointer hover:bg-secondaryLightBg": !isAdmin && !isConversationListLoading,
           "!bg-secondaryLightBg": selectedConversation && selectedConversation?.conversationId === convData?.conversationId,
         },
         className
@@ -85,6 +85,7 @@ const Conversation = ({
             <CustomTypography label={isAdmin ? currentUser?.email : convData?.user?.email} variant="body2" />
           ) : (
             <Skeleton
+              variant="text"
               wrapperClassName={classNames({
                 hidden: isAdmin,
               })}
