@@ -9,6 +9,7 @@ import { AuthContext } from "context/authContext";
 import { isValidEmail } from "helpers";
 import { googleLoginApi } from "apis/login";
 import GoogleSvgComponent from "assets/icons/google";
+import { googleLoginUser } from "apis/login";
 
 const Login = () => {
   const [formData, setFormData] = useState(loginUserInitialValues);
@@ -52,12 +53,17 @@ const Login = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
-        const { data } = await googleLoginApi(codeResponse);
-        setUserDetails({
-          _id: "notdecided",
-          fullName: data.name,
-          email: data.email,
+        const {
+          data: { email, name, picture },
+        } = await googleLoginApi(codeResponse);
+        const {
+          data: { user },
+        } = await googleLoginUser({
+          email,
+          name,
+          profilePhoto: picture,
         });
+        setUserDetails(user);
         Navigate("/dashboard");
       } catch (error) {
         showToast(`Login failed: ${error}`);

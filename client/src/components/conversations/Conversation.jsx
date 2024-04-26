@@ -35,6 +35,7 @@ const Conversation = ({
       <ProfileAvatar
         name={isAdmin ? currentUser?.fullName : convData?.user?.name}
         isOnline={!!checkOnlineusers(currentUser?._id, onlineUsers, convData)}
+        profilePhoto={isAdmin ? currentUser?.profilePhoto : convData?.user?.profilePhoto}
       />
     );
   };
