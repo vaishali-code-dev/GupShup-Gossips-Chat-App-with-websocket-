@@ -1,5 +1,5 @@
-# GHUPSHUP & GOSSIPS
-"Ghupshup & Gossips" is a modern chat application that enables real-time communication between users. Built using cutting-edge technologies including React, Webpack, Node.js, Express, MongoDB, and Socket.io, it offers a seamless chatting experience.
+# GUPSHUP & GOSSIPS
+"Gupshup & Gossips" is a modern chat application that enables real-time communication between users. Built using cutting-edge technologies including React, Webpack, Node.js, Express, MongoDB, and Socket.io, it offers a seamless chatting experience.
 
 ## Features
 
@@ -22,9 +22,9 @@
 
 ## Deployment
 
-The server side of "Talk To The World" is deployed on *Heroku, while the client side is deployed on **Netlify*. This setup ensures high availability and scalability of the application, allowing users to access it from anywhere with an internet connection.
+The server side of "Gupshup & Gossips" is deployed on *Heroku, while the client side is deployed on **Netlify*. This setup ensures high availability and scalability of the application, allowing users to access it from anywhere with an internet connection.
 
 ## Live Demo-
 https://ghupshup-gossips.netlify.app
 
-Experience the joy of seamless communication and connect with people from around the world with "Ghupshup & Gossips".
+Experience the joy of seamless communication and connect with people from around the world with "Gupshup & Gossips".
