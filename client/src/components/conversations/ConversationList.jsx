@@ -11,6 +11,7 @@ import { ButtonUsage, UserAutoComplete, Conversation, CustomTypography } from "c
 
 const ConversationList = ({ customClassName, setSelectedConversation, selectedConversation }) => {
   const [conversationList, setConversationList] = useState([]);
+  const conversationListRef = useRef([]);
   const [isConversationListLoading, setIsConversationListLoading] = useState(true);
   const [isShowAddUserAutoComplete, setIsShowAddUserAutoComplete] = useState(false);
   const [selectedUserValue, setSelectedUserValue] = useState(null);
@@ -25,6 +26,20 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
       socket.on("getNewConversation", (newMsg) => {
         setConversationList((prevMssg) => [...prevMssg, newMsg]);
       });
+      socket.on("getNewMessageInConversation", (conversation) => {
+        console.log({ conversationListRef });
+        let localConversationList = [...conversationListRef.current];
+        let newConvIdx = localConversationList.findIndex((conv) => conv.conversationId === conversation.conversationId);
+        localConversationList[newConvIdx] = {
+          ...localConversationList[newConvIdx],
+          lastMessage: {
+            message: conversation.lastMessage.message,
+            senderId: conversation.lastMessage.senderId,
+          },
+        };
+        setConversationList(localConversationList);
+        conversationListRef.current = localConversationList;
+      });
     }
   }, [socket, currentUser]);
 
@@ -32,6 +47,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
     try {
       let { data } = await getConversation(currentUser?._id);
       setConversationList(data);
+      conversationListRef.current = data;
     } catch (error) {
       showToast(error);
     } finally {

@@ -75,7 +75,7 @@ const Login = () => {
   return (
     <div className="flex justify-center items-center w-full h-screen bg-primaryWhite">
       <div className="py-6 w-full m-6 md:w-2/5 md:m-0 bg-primaryLightBg rounded-2xl flex flex-col justify-evenly shadow-xl">
-        <CustomTypography label=" GhupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
+        <CustomTypography label=" GupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="flex flex-col gap-6 w-3/4">
             <Input

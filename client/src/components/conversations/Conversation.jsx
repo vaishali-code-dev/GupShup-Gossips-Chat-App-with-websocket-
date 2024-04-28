@@ -5,7 +5,6 @@ import { AuthContext } from "context/authContext";
 import { SocketContext } from "context/socketContext";
 import useToaster from "hooks/useToaster";
 import { checkOnlineusers } from "helpers";
-import { logoutUser } from "apis/login";
 import { ProfileAvatar, CustomTypography, ButtonUsage, Skeleton } from "components";
 
 const Conversation = ({
@@ -16,7 +15,7 @@ const Conversation = ({
   selectedConversation,
   isConversationListLoading,
 }) => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, logOutUser } = useContext(AuthContext);
   const { onlineUsers } = useContext(SocketContext);
   const Navigate = useNavigate();
   const { showToast } = useToaster();
@@ -40,12 +39,6 @@ const Conversation = ({
     );
   };
 
-  const logOutUser = () => {
-    logoutUser(currentUser._id);
-    sessionStorage.removeItem("token");
-    Navigate("/");
-    showToast("Logout successfully, Hope to see you soon.");
-  };
   return (
     <div
       className={classNames(
@@ -81,8 +74,24 @@ const Conversation = ({
               />
             )}
           </div>
-          {!isConversationListLoading ? (
+          {/* {!isConversationListLoading ? (
             <CustomTypography label={isAdmin ? currentUser?.email : convData?.user?.email} variant="body2" />
+          ) : (
+            <Skeleton
+              variant="text"
+              wrapperClassName={classNames({
+                hidden: isAdmin,
+              })}
+            />
+          )} */}
+          {!isConversationListLoading ? (
+            <CustomTypography
+              label={isAdmin ? currentUser?.email : convData?.lastMessage?.message ?? ""}
+              className={classNames("text-start break-words !ubuntu-light", {
+                "!text-primaryDarkBg": !isAdmin,
+              })}
+              variant="body2"
+            />
           ) : (
             <Skeleton
               variant="text"
