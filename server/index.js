@@ -10,7 +10,7 @@ import connectDB from "./db/connection.js";
 import Users from "./models/Users.js";
 import Conversations from "./models/conversations.js";
 import Messages from "./models/messages.js";
-import { formatIST } from "./helpers.js";
+import { formatIST, getFormattedDateTime } from "./helpers.js";
 
 const PORT = process.env.PORT || 8088;
 
@@ -214,12 +214,15 @@ app.post("/api/message", async (req, res) => {
             lastMessage: {
               message,
               senderId,
+              dateTime: getFormattedDateTime(),
             },
           },
         }
       );
       await newMessage.save();
-      res.status(200).json({ newMessage: { ...newMessage.toObject(), dateTime: formatIST() } });
+      res.status(200).json({
+        newMessage: { ...newMessage.toObject(), dateTime: getFormattedDateTime() },
+      });
     }
   } catch (error) {
     console.log(error);
@@ -231,8 +234,13 @@ app.get("/api/message/:conversationId", async (req, res) => {
   try {
     const conversationId = req.params.conversationId;
     const messagesList = await Messages.find({ conversationId });
-
-    res.status(200).json(messagesList);
+    let listWithISTDateTime = messagesList
+      .map((el) => el.toObject())
+      .map((item) => ({
+        ...item,
+        dateTime: getFormattedDateTime(item.dateTime),
+      }));
+    res.status(200).json(listWithISTDateTime);
   } catch (error) {
     console.log(error);
     res.status(500).send("Something wrong.");
@@ -291,7 +299,10 @@ io.on("connection", (socket) => {
       let senderUser = await Users.findById(newMessage.senderId);
 
       if (findOnlineUserReceiver) {
-        io.to(findOnlineUserReceiver.socketId).emit("getNewMessages", newMessage);
+        io.to(findOnlineUserReceiver.socketId).emit("getNewMessages", {
+          ...newMessage,
+          dateTime: getFormattedDateTime(),
+        });
         io.to(findOnlineUserReceiver.socketId).emit("getNewMessageInConversation", {
           user: {
             name: receiverUser.fullName,
@@ -303,16 +314,24 @@ io.on("connection", (socket) => {
           lastMessage: {
             message: newMessage.message,
             senderId: newMessage.senderId,
+            dateTime: getFormattedDateTime(),
           },
         });
       }
 
       if (findOnlineUserSender) {
         io.to(findOnlineUserSender.socketId).emit("getNewMessageInConversation", {
+          user: {
+            name: senderUser.fullName,
+            email: senderUser.email,
+            id: senderUser._id,
+            profilePhoto: senderUser?.profilePhoto,
+          },
           conversationId: newMessage.conversationId,
           lastMessage: {
             message: newMessage.message,
             senderId: newMessage.senderId,
+            dateTime: getFormattedDateTime(),
           },
         });
       }

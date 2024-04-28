@@ -44,7 +44,10 @@ const SignUp = () => {
   return (
     <div className="flex justify-center items-center w-full h-screen bg-primaryWhite">
       <div className="py-6 w-full m-6 md:w-2/5 md:m-0 bg-primaryLightBg rounded-2xl flex flex-col justify-evenly shadow-xl">
-        <CustomTypography label=" GupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="mb-4" />
+        <div className="flex justify-center bg-transparent mt-2">
+          <img src="https://ideogram.ai/api/images/direct/jxP3AVFZRY66SJ7DVhNBJg.png" className="w-40 mix-blend-multiply" />
+        </div>
+        <CustomTypography label=" GupShup & Gossips" variant="h5" className="ubuntu-medium" wrapperClassName="my-4" />
         <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="flex flex-col gap-6 w-3/4">
             <Input label="Name" value={formData.fullName} id="fullName" variant="standard" handleChange={handleChange} />

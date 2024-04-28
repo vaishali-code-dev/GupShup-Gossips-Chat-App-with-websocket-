@@ -15,19 +15,29 @@ const Message = ({ isAdmin, message, isMessagesListLoading }) => {
           {
             "bg-primaryLightBg rounded-tl-none": !isAdmin,
             "bg-primaryDarkBg text-primaryWhite rounded-tr-none": isAdmin && !isMessagesListLoading,
-            "p-2 lg:p-4": !isMessagesListLoading,
+            "p-1 lg:p-2": !isMessagesListLoading,
           }
         )}
       >
         {!isMessagesListLoading && message ? (
-          <CustomTypography
-            label={message?.message}
-            variant="body1"
-            className={classNames("text-start", {
-              "!text-textBlack": !isAdmin,
-              "!text-primaryWhite": isAdmin,
-            })}
-          />
+          <>
+            <CustomTypography
+              label={message?.message}
+              variant="body1"
+              className={classNames("text-start", {
+                "!text-textBlack": !isAdmin,
+                "!text-primaryWhite": isAdmin,
+              })}
+            />
+            <CustomTypography
+              label={message?.dateTime}
+              variant="caption"
+              className={classNames("text-end !text-[0.6rem] lg:!text-xs", {
+                "!text-textBlack": !isAdmin,
+                "!text-primaryWhite": isAdmin,
+              })}
+            />
+          </>
         ) : (
           <Skeleton wrapperClassName="!p-0" />
         )}

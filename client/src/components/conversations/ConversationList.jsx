@@ -13,6 +13,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
   const [conversationList, setConversationList] = useState([]);
   const conversationListRef = useRef([]);
   const [isConversationListLoading, setIsConversationListLoading] = useState(true);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [isShowAddUserAutoComplete, setIsShowAddUserAutoComplete] = useState(false);
   const [selectedUserValue, setSelectedUserValue] = useState(null);
   const [users, setUsers] = useState([]);
@@ -27,7 +28,6 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
         setConversationList((prevMssg) => [...prevMssg, newMsg]);
       });
       socket.on("getNewMessageInConversation", (conversation) => {
-        console.log({ conversationListRef });
         let localConversationList = [...conversationListRef.current];
         let newConvIdx = localConversationList.findIndex((conv) => conv.conversationId === conversation.conversationId);
         localConversationList[newConvIdx] = {
@@ -35,6 +35,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
           lastMessage: {
             message: conversation.lastMessage.message,
             senderId: conversation.lastMessage.senderId,
+            dateTime: conversation.lastMessage?.dateTime,
           },
         };
         setConversationList(localConversationList);
@@ -85,6 +86,7 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
 
   const handleCreateConversation = async () => {
     try {
+      setIsCreatingConversation(true);
       let senderId = currentUser._id;
       let receiverId = formattedUsersList.current.find((item) => item.label === selectedUserValue.label).id;
       let { data } = await createConversation({ senderId, receiverId });
@@ -93,6 +95,9 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
       fetchConversation();
     } catch (error) {
       showToast(error);
+      setIsCreatingConversation(false);
+    } finally {
+      setIsCreatingConversation(false);
     }
   };
 
@@ -156,7 +161,12 @@ const ConversationList = ({ customClassName, setSelectedConversation, selectedCo
             <div className="flex-1">
               <UserAutoComplete usersList={users} value={selectedUserValue} setValue={setSelectedUserValue} />
             </div>
-            <ButtonUsage disabled={!selectedUserValue} label="CHAT" onClick={handleCreateConversation} size="small" />
+            <ButtonUsage
+              disabled={!selectedUserValue || isConversationListLoading}
+              label="CHAT"
+              onClick={handleCreateConversation}
+              size="small"
+            />
           </div>
         )}
 

@@ -7,4 +7,8 @@ const formatIST = (date) => {
     .format();
 };
 
-export { formatIST };
+const getFormattedDateTime = (date) => {
+  return moment(formatIST(date ?? moment())).format("MMMM Do, h:mm:ss a");
+};
+
+export { formatIST, getFormattedDateTime };

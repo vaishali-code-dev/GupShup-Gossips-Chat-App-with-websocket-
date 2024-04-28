@@ -13,6 +13,7 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
   const [userInput, setuserInput] = useState("");
   const [messagesList, setMessagesList] = useState("");
   const [isMessagesListLoading, setIsMessagesListLoading] = useState(true);
+  const [isMessagesSending, setIsMessagesSending] = useState(false);
   const { showToast } = useToaster();
   const { currentUser } = useContext(AuthContext);
   const { socket, onlineUsers } = useContext(SocketContext);
@@ -53,6 +54,7 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
 
   const sendMessage = useCallback(async () => {
     try {
+      setIsMessagesSending(true);
       let payload = {
         conversationId: selectedConversation?.conversationId,
         senderId: currentUser?._id,
@@ -66,6 +68,9 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
       // fetchMessages(selectedConversation);
     } catch (error) {
       showToast(error);
+      setIsMessagesSending(false);
+    } finally {
+      setIsMessagesSending(false);
     }
   }, [selectedConversation, userInput]);
 
@@ -125,7 +130,13 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
               size="small"
               autoFocus={!checkIsUserOnMobile}
             />
-            <IconButton type="submit" color="primary" className="!text-primaryDarkBg" aria-label="send message">
+            <IconButton
+              disabled={isMessagesSending}
+              type="submit"
+              color="primary"
+              className="!text-primaryDarkBg"
+              aria-label="send message"
+            >
               <Send className="!text-3xl" />
             </IconButton>
           </form>
