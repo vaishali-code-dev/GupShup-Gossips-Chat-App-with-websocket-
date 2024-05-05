@@ -17,7 +17,7 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
   const [isMessagesSending, setIsMessagesSending] = useState(false);
   const { showToast } = useToaster();
   const { currentUser } = useContext(AuthContext);
-  const { socket, onlineUsers } = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const bottomScrollViewRef = useRef();
   useEffect(() => {
     if (bottomScrollViewRef.current) {
