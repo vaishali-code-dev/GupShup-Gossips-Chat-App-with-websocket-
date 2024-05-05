@@ -10,12 +10,14 @@ import { isValidEmail } from "helpers";
 import { googleLoginApi } from "apis/login";
 import GoogleSvgComponent from "assets/icons/google";
 import { googleLoginUser } from "apis/login";
-import { Height } from "@mui/icons-material";
+import { LOGIN_TYPE } from "constant";
+import Loader from "assets/icons/loader";
 
 const Login = () => {
   const [formData, setFormData] = useState(loginUserInitialValues);
   const [errors, setErrors] = useState({});
-  const { currentUser, setUserDetails } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState("");
+  const { setUserDetails } = useContext(AuthContext);
   const Navigate = useNavigate();
   const { showToast } = useToaster();
 
@@ -33,6 +35,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      setIsLoading(LOGIN_TYPE.normal);
       if (!isValidEmail(formData.email)) {
         setErrors({ ...errors, email: "Please type correct email." });
       } else {
@@ -48,12 +51,15 @@ const Login = () => {
       }
     } catch (error) {
       showToast("Something wrong");
+    } finally {
+      setIsLoading("");
     }
   };
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
+        setIsLoading(LOGIN_TYPE.gAuth);
         const {
           data: { email, name, picture },
         } = await googleLoginApi(codeResponse);
@@ -68,6 +74,8 @@ const Login = () => {
         Navigate("/dashboard");
       } catch (error) {
         showToast(`Login failed: ${error}`);
+      } finally {
+        setIsLoading("");
       }
     },
     onError: (error) => showToast(`Login failed: ${error}`),
@@ -99,15 +107,23 @@ const Login = () => {
               variant="standard"
               handleChange={handleChange}
             />
-            <ButtonUsage label="LOGIN" type="submit" />
+            {isLoading === LOGIN_TYPE.normal ? (
+              <ButtonUsage variant="outlined" size="small" className="w-full" />
+            ) : (
+              <ButtonUsage label="LOGIN" type="submit" />
+            )}
           </div>
         </form>
         <div className="flex justify-center pt-4">
-          <ButtonUsage variant="outlined" size="small" onClick={googleLogin}>
-            <div className="flex gap-2 items-center">
-              <GoogleSvgComponent />
-              <CustomTypography variant="body2" label="Sign in with Google" />
-            </div>
+          <ButtonUsage variant="outlined" size="small" onClick={googleLogin} className="w-52">
+            {isLoading === LOGIN_TYPE.gAuth ? (
+              <Loader />
+            ) : (
+              <div className="flex gap-2 items-center">
+                <GoogleSvgComponent />
+                <CustomTypography variant="body2" label="Sign in with Google" />
+              </div>
+            )}
           </ButtonUsage>
         </div>
         <div>

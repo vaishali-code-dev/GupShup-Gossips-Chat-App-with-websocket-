@@ -7,7 +7,8 @@ import { AuthContext } from "context/authContext";
 import { SocketContext } from "context/socketContext";
 import { getMessages, sendMessageApi } from "apis/messages";
 import { CustomTypography, Message, Input, MessageHeader } from "components";
-import { checkIsUserOnMobile } from "../../helpers";
+import { checkIsUserOnMobile } from "helpers";
+import Loader from "assets/icons/loader";
 
 const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI }) => {
   const [userInput, setuserInput] = useState("");
@@ -137,7 +138,7 @@ const Messages = ({ customClassName, selectedConversation, setIsShowMessageUI })
               className="!text-primaryDarkBg"
               aria-label="send message"
             >
-              <Send className="!text-3xl" />
+              {isMessagesSending ? <Loader /> : <Send className="!text-3xl" />}
             </IconButton>
           </form>
         </>
